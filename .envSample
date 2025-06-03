@@ -1,0 +1,39 @@
+PORT=
+NODE_ENV=
+
+# MongoDB Configuration
+
+MONGO_URI=
+
+# JWT Configuration
+
+JWT_SECRET=<secret_key>
+JWT_EXPIRES_IN=
+JWT_COOKIE_EXPIRES_IN=
+
+
+# Client URL (for CORS)
+CLIENT_URL=<client_url>
+
+# Cloudinary Configuration (for file uploads)
+
+CLOUDINARY_CLOUD_NAME=<cloud_name>
+CLOUDINARY_API_KEY=<api_key>
+CLOUDINARY_API_SECRET=<api_secret>
+
+# SMTP Configuration (for emails)
+
+SMTP_HOST=<smtp_host>
+SMTP_PORT=<smtp_port>
+SMTP_USER=<smtp_user>
+SMTP_PASS=<smtp_pass>
+
+# File Upload Configuration
+
+MAX_FILE_SIZE=
+UPLOAD_PATH=
+
+# Security Configuration
+BCRYPT_SALT_ROUNDS=
+RATE_LIMIT_WINDOW=
+RATE_LIMIT_MAX=
