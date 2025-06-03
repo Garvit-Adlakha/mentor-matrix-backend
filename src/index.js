@@ -111,6 +111,13 @@ app.use((err, req, res, next) => {
   });
 });
 
+app.use('*', (req, res) => {
+  res.status(404).json({
+    status: "error",
+    message: "Route not found",
+  });
+});
+
 // Start server
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
