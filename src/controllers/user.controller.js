@@ -389,7 +389,8 @@ export const forgotPassword = catchAsync(async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     // Create reset URL - in production, this should be a frontend URL
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+    const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetUrl = `${clientUrl.replace(/\/$/, '')}/reset-password/${resetToken}`;
 
     try {
         await sendEmail({
@@ -399,7 +400,7 @@ export const forgotPassword = catchAsync(async (req, res) => {
                 <h1>Password Reset</h1>
                 <p>You requested a password reset. Please click the button below to reset your password:</p>
                 <a href="${resetUrl}" style="display:inline-block;background:#4f46e5;color:white;padding:10px 15px;text-decoration:none;border-radius:4px;">Reset Password</a>
-                <p>If you didn't request this, please ignore this email. This link is valid for 15 minutes.</p>
+                <p>If you didn't request this, please ignore this email. This link is valid for 10 minutes.</p>
             `,
         });
 
@@ -759,4 +760,3 @@ export const verifyMentor = catchAsync(async (req, res) => {
         }
     });
 });
-
