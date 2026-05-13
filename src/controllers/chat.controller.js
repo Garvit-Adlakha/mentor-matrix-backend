@@ -26,18 +26,33 @@ export const createGroup = async (projectId) => {
     const existingChat = await Chat.findOne({ project: projectId }).lean();
     if (existingChat) return existingChat;
 
-    const participants = Array.from(
-      new Set([
-        project.createdBy?._id.toString(),
-        project.assignedMentor?._id.toString(),
-        ...project.teamMembers.map(member => member._id.toString()),
-      ]).filter(Boolean) // Filter out any undefined values
-    );
+    // Collect unique participants as ObjectIds
+    const participantsSet = new Set();
+    
+    if (project.createdBy?._id) {
+      participantsSet.add(project.createdBy._id.toString());
+    }
+    if (project.assignedMentor?._id) {
+      participantsSet.add(project.assignedMentor._id.toString());
+    }
+    if (project.teamMembers && Array.isArray(project.teamMembers)) {
+      project.teamMembers.forEach(member => {
+        if (member._id) {
+          participantsSet.add(member._id.toString());
+        }
+      });
+    }
+
+    const participants = Array.from(participantsSet);
+    
+    if (participants.length === 0) {
+      throw new AppError('No participants found for group chat', 400);
+    }
 
     const groupChat = await Chat.create({
       name: `${project.title} - Group Chat`,
       project: projectId,
-      participants,
+      participants: participants,
       isGroupChat: true,
     });
 

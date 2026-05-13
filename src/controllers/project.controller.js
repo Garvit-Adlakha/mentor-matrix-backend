@@ -95,15 +95,25 @@ export const createProject = catchAsync(async (req, res, next) => {
         }
     }
 
+    // Create chat group for the project
+    let chatGroup = null;
+    try {
+        chatGroup = await createGroup(newProject._id);
+    } catch (chatError) {
+        console.error("Error creating group chat for new project:", chatError);
+        // Continue even if chat creation fails
+    }
+
     // Populate project data before sending response
     const populatedProject = await Project.findById(newProject._id)
         .populate("createdBy assignedMentor teamMembers");
 
     res.status(201).json({
         success: true,
-        message: "Project created successfully",
+        message: "Project created successfully" + (chatGroup ? " and chat group created" : ""),
         project: populatedProject,
-        mentorRequest: mentorRequestResult
+        mentorRequest: mentorRequestResult,
+        chatGroup: chatGroup || null
     });
 });
 
@@ -714,7 +724,14 @@ Follow this exact format with these section headers for proper UI parsing. Keep 
         project.review = review;
         await project.save();
     } catch (err) {
-        return next(new AppError("Failed to generate project review", 500));
+        console.error("Review generation error:", err.message);
+        
+        // Check if it's a quota/rate limit error
+        if (err.message?.includes("429") || err.message?.includes("quota") || err.message?.includes("RESOURCE_EXHAUSTED")) {
+            return next(new AppError("AI service temporarily unavailable due to rate limits. Please try again in a few moments.", 503));
+        }
+        
+        return next(new AppError("Failed to generate project review. Please try again later.", 500));
     }
 
     res.status(200).json({

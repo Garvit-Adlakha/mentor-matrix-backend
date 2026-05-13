@@ -23,7 +23,9 @@ export const initializeSocket = (server) => {
       credentials: true,
     },
     maxHttpBufferSize: 1e7, // 10MB WebSocket Compression
+    transports: ['websocket'], // Force websocket only, disable polling for better performance
   });
+  console.log('Socket.io initialized with websocket transport only');
 
   // 1. Room Management Optimization
   // Use userId everywhere after authentication for consistency
@@ -106,7 +108,7 @@ export const initializeSocket = (server) => {
 
   // WebSocket Connection
   io.on("connection", (socket) => {
-    console.log("User connected:", socket.id);
+    console.log("User connected:", socket.id, "Transport:", socket.conn.transport.name);
     // Only use userId after authentication
     onlineUsers.set(socket.id, socket.id);
     socket.broadcast.emit("userOnline", socket.id);
